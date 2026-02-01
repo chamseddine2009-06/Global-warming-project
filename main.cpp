@@ -10,7 +10,7 @@
 #include <unistd.h>
 void Rotate(double& x,double& y,double xx,double yy,double theta);
 
-//void Sun (int x , int y , int r );
+
 
 Font f3270 ;
 Font fcaskaydia;
@@ -26,43 +26,6 @@ int height = 1000;
 class Sun {
 	int amx, amy , amr , Mleng;
 	long int TiPerTrav , Mdeley;
-	void AMov(){
-		static int clk = (clock()*1000)/(CLOCKS_PER_SEC);
-		if(!Moving){//if not moving , update the clock just to be rigth in when it is moving
-			clk = (clock()*1000)/(CLOCKS_PER_SEC);
-		}else {
-
-
-			if(amx==x && amy==y){
-				Moving=false;
-				return;
-			}
-
-
-			static int speed = 1;
-					if(amx!=x && amy != y && (((clock()*1000)/(CLOCKS_PER_SEC))-clk >= TiPerTrav)){
-				static double xx = (double)x;
-				static double yy = (double)y;
-				//static double sincc = 0.0 ;
-				//sincc += 3.14159 / (double) Mleng;
-
-				xx+=((double)(x-amx))/((double)( (amy-y)*(amy-y) >=1 ? (amy-y) : 1));//*(cos(sincc)+1);
-				//yy+=(((double)(x-amx))/((double)(amy-y)));
-				//usleep(10000);
-				x = (int)xx;
-				y > amy ? y-- :y < amy ? y++  : 0;
-				//xx*=(cos(sincc)+1);
-				clk = (clock()*1000)/(CLOCKS_PER_SEC);
-				//y = (int)yy;
-				
-				
-				
-			}
-
-
-		}
-		return;
-	}
 	
 public:
 	int x=0 , y=0 ,r=10;
@@ -72,25 +35,7 @@ public:
 	Sun (int X , int Y , int R): x(X),y(Y),r(R)
 	{}
 	bool Moving = false;
-	void AnemetionMove(int X, int Y , int R , long int deleyInMs){
-		if(Moving){
-			std::cout<<"\nAlready in moving ...";	//that is it
-		}if(!Moving){
-			amx = X;
-			amy = Y;
-			amr = R;
-			if(X==x && Y == y){
-				std::cout<<"\nAlready In ...";
-				return;
-			}
-		
-			TiPerTrav = deleyInMs/sqrt((double)((amx-x)*(amx-x) + (amy-y)*(amy-y)));
-			Mdeley = deleyInMs;
-			Moving = true;
-		}
-	}//defently a mess
-	void draw (){
-		AMov();
+	void draw (){	
 		DrawCircle(  x,  y,  r,YELLOW);
 		int dencity = r+r/5;
 		int lineT = (r*3)/5;
@@ -124,7 +69,6 @@ class Earth {
 	Color clor = BLUE;
 	Earth (int X , int Y, int R)
 		: x(X) , y(Y) , r(R) {
-	//	earthT = LoadTexture("./sprits/earth.png");
 
 	}
 	
@@ -149,14 +93,7 @@ class Earth {
 		
 		float scale = (double)(r*1.7) / (double)((double)earthT.width *(double)(earthT.width / earthT.height) );
 		
-		DrawTextureEx(earthT, {x- ((earthT.width * scale) /2 ),y + (sin(sinCoun)*sinEff)-((earthT.width *scale )/2) + 20}, 0.0, scale  , WHITE);
-		/*DrawTexturePro(earthT, 
-				(Rectangle){ 0,0, earthT.width, earthT.height }, 
-				(Rectangle){ x , y + 17 + (r * ((double)earthT.height / (double)earthT.width )) , r *2  , r * 2 *  ((double)earthT.height / (double)earthT.width )}, 
-				{x+r-70  , y   + (r * ((double)earthT.height / (double)earthT.width ))}, 
-				0.0, 
-				WHITE);*/
-		
+		DrawTextureEx(earthT, {x- ((earthT.width * scale) /2 ),y + (sin(sinCoun)*sinEff)-((earthT.width *scale )/2) + 20}, 0.0, scale  , WHITE);	
 
 		if( ((clock()*1000)/CLOCKS_PER_SEC) >= (clk + msPerMv) ){
 			//rota+=rotaSpeed;
@@ -463,7 +400,7 @@ int main() {
 		btn3.draw();
 		btn4.draw();
 		btn5.draw();
-		btn6.draw();		//earth.y+= cos(cc);
+		btn6.draw();
 		run.draw();
 		if(PresentYear > 2026){
 			reset.draw();
@@ -495,7 +432,7 @@ void Esp1(Sun& sun , Earth& earth , Moon& moon , Bootn& b1 , Bootn& b2 , Bootn& 
 		if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))break;
 
 	}
-	for(int i =  0 ; i < (sun.r * 2 +  sun.r/5 + ((sun.r*3)/5   - 5)) + sun.y  || b1.y>100; i++ ){
+	for(int i =  0 ; (i < (sun.r * 2 +  sun.r/5 + ((sun.r*3)/5   - 5)) + sun.y  || b1.y>100) && !WindowShouldClose(); i++ ){
 		
 		b1.y--;
 		b2.y--;
@@ -525,12 +462,13 @@ void Esp1(Sun& sun , Earth& earth , Moon& moon , Bootn& b1 , Bootn& b2 , Bootn& 
 		usleep(1000);
 		EndDrawing();
 	}
+	if(WindowShouldClose())return;
 	earth.x = -400;
 	usleep(700000);
 	double pBlanS = earth.balnSpeed;
 	earth.balnSpeed = 0.0;
 	int des = abs(-80 - earth.x);
-	for(double siC = 0.0 , ex = (double)earth.x , bx = 0.0;  (earth.x)<  -80 ; siC += /*3.14159*/1.0/(double)des){
+	for(double siC = 0.0 , ex = (double)earth.x , bx = 0.0;  ((earth.x)<  -80) && !WindowShouldClose() ; siC += /*3.14159*/1.0/(double)des){
 		
 		BeginDrawing();
 		ClearBackground(BLACK);
@@ -561,13 +499,11 @@ void Esp1(Sun& sun , Earth& earth , Moon& moon , Bootn& b1 , Bootn& b2 , Bootn& 
 		usleep(2000);
 		EndDrawing();
 	}
+	if(WindowShouldClose())return;
 	usleep(500000);
 	earth.balnSpeed = pBlanS;
 	
-	/*for(int i =  0 ; i < 10 ; i ++){
 
-	}*/
-	//sun.AnemetionMove(width/2, height/2, 50, 1000);
 
 
 }
@@ -582,4 +518,4 @@ void Rotate(double& x,double& y,double xx,double yy,double theta){
 	x=xx+X*cos(raduis)-Y*sin(raduis);
 	y=yy+X*sin(raduis)+Y*cos(raduis);
 	return ;
-} 
+}
